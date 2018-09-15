@@ -5,10 +5,12 @@ import {
   Text,
   View,
   RefreshControl,
-  ActivityIndicator 
+  ActivityIndicator,
+  TouchableOpacity,
+  Icon
 } from 'react-native';
 
-import { Divider } from 'react-native-elements';
+import { Divider, Button } from 'react-native-elements';
 import { Reactions } from '../components/reactions';
 
 let emojiItems = [
@@ -66,7 +68,22 @@ export class MainScreen extends React.Component {
         });
       })
       .catch((error) => {
-        console.error(error);
+        this.setState({
+          isLoading: false,
+          refreshing: false,
+          posts: [
+            {
+              _id: {
+                $oid: "5b9ce382e6ce4f000868e150"
+              },
+              username: "page_not_working",
+              message: "😥😥",
+              timestamp: {
+                $date: 1537008514444
+              },
+              reactions: [ ]
+            }]
+        });
       });
   }
 
@@ -84,6 +101,7 @@ export class MainScreen extends React.Component {
     }
 
     return (
+      <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.contentContainer} 
         style={styles.container}
@@ -110,6 +128,24 @@ export class MainScreen extends React.Component {
           )
         }
       </ScrollView>
+      <TouchableOpacity
+          style={{
+              borderWidth:1,
+              borderColor:'rgba(0,0,0,1)',
+              alignItems:'center',
+              justifyContent:'center',
+              width:100,
+              height:100,
+              backgroundColor:'#7a0068',
+              borderRadius: 50,
+              position: "absolute",
+              bottom: 5,
+              right: 5
+            }}
+        >
+          <Text style={{fontSize: 40}}>✍️</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 }
