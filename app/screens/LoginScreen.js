@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage, Button } from 'react-native-elements'
+const CONFIG = require('../config');
 
 export class LoginScreen extends React.Component {
     static navigationOptions = {
@@ -8,7 +9,7 @@ export class LoginScreen extends React.Component {
     };
     _login() {
         console.log("username: " + this.state.user + "pass: " + this.state.pass);
-        fetch('http://192.168.43.56/auth', {
+        fetch(CONFIG.API_URL + 'auth', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -34,7 +35,7 @@ export class LoginScreen extends React.Component {
     };
     _signup() {
         console.log("username: " + this.state.user + "pass: " + this.state.pass);
-        fetch('http://192.168.43.56/register', {
+        fetch(CONFIG.API_URL + '/register', {
           method: 'POST',
           headers: {
             Accept: 'application/json',

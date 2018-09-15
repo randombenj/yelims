@@ -15,5 +15,4 @@ const App = createBottomTabNavigator({
   Login: { screen: LoginScreen },
 });
 
-
 export default App;
