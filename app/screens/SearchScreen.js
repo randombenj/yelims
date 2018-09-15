@@ -1,41 +1,55 @@
 import React from 'react';
-import { Text, StatusBar, SafeAreaView } from 'react-native';
+import { View, FlatList } from 'react-native';
+import { SearchBar, ListItem } from 'react-native-elements'
 
 export class SearchScreen extends React.Component {
-    static navigationOptions = {
-      title: 'Search',
-    };
-    componentDidMount() {
-        let isAndroid = true;
-        this._navListener = this.props.navigation.addListener('didFocus', () => {
-            StatusBar.setBarStyle('dark-content');
-            isAndroid && StatusBar.setBackgroundColor('#ff00ff');
+  static navigationOptions = {
+    title: 'Search'
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      users: ["type something to find peace",]
+    }
+  }
+
+  loadUsers = (text) => {
+    return fetch('http://192.168.43.56/users?username=' + text)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          users: responseJson.users,
+        }, function () {
+
         });
-    }
-    
-    componentWillUnmount() {
-        this._navListener.remove();
-    }
-    render() {
-        return (
-            <SafeAreaView style={[{ backgroundColor: '#00ff00' }]}>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-                <Text>ASDTEST</Text>
-            </SafeAreaView>
-        );
-    }
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({ users: ["no users found..",] });
+      });
+  };
+
+  render() {
+    return (
+      <View>
+        <SearchBar
+          round
+          lightTheme
+          onChangeText={this.loadUsers}
+          onClearText={this.loadUsers}
+          placeholder='Search other yelims...' />
+        <FlatList
+          data={this.state.users}
+          renderItem={({ item }) =>
+            <ListItem
+              hideChevron
+              key={item}
+              title={item}
+            />
+          }
+        />
+      </View>
+    );
+  }
 }
