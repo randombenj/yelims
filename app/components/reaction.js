@@ -15,7 +15,6 @@ export class Reaction extends React.Component {
             onPress={() => {
                 console.log("going to call addreaction ...");
                 console.log("postid: ", this.props.postId)
-                this.state.count++;
                 this.props.addreaction(this.props.postId, this.props.emoji);
             }}
         >

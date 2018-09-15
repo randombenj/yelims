@@ -95,6 +95,7 @@ export class MainScreen extends React.Component {
       this.setState({
           posts: posts
       });
+      this.forceUpdate();
     })
     .catch((err) => {
         console.log(err);
