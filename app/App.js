@@ -11,11 +11,11 @@ import { AddScreen } from './screens/AddScreen';
 
 
 const App = createBottomTabNavigator({
-  Login: { screen: LoginScreen },
   Home: { screen: MainScreen },
   Map: { screen: MapScreen },
   Search: { screen: SearchScreen },
   Profile: { screen: ProfileScreen },
+  Logout: { screen: LoginScreen },
   Add: { screen: AddScreen },
 },
 {
@@ -31,7 +31,7 @@ const App = createBottomTabNavigator({
         iconName = 'ios-search';
       } else if (routeName === 'Profile') {
         iconName = 'md-analytics';
-      } else if (routeName === 'Login') {
+      } else if (routeName === 'Logout') {
         iconName = 'ios-key';
       }
 
@@ -40,6 +40,7 @@ const App = createBottomTabNavigator({
       return <Ionicons name={iconName} size={25} color={tintColor} />;
     },
   }),
+  initialRouteName: 'Logout',
   tabBarOptions: {
     activeTintColor: 'tomato',
     inactiveTintColor: 'gray',
