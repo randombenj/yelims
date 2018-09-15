@@ -10,7 +10,7 @@ export class Reactions extends React.Component {
             {
                 this.props.reactions.map((reaction) => 
                 (
-                    <Reaction emoji={reaction.emoji} count={reaction.count} />
+                    <Reaction key={reaction.emoji} emoji={reaction.emoji} count={reaction.count} />
                 ))
             }
         </View>

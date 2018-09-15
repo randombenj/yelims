@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
 
-import { Divider, Card } from 'react-native-elements';
+import { Divider } from 'react-native-elements';
+import { Reactions } from './components/reactions';
 
-let items = [
+let emojiItems = [
   "😀","😁", "😂", "🤣", "😃", "😄", "😇", "🤠", "🤡", "😸", "😹", "😻",
   "👫", "👭", "👬", "💑","👩", "❤️‍", "👩", "💩", "💩"
 ]
@@ -11,6 +12,25 @@ let items = [
 let users = [
   "@randombenj", "@fliiiix", "@tuxtimo", "@eddex", "@murc"
 ]
+
+const data = [
+  {
+    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
+    "count": 5,
+  },
+  {
+    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
+    "count": 5,
+  },
+  {
+    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
+    "count": 5,
+  },
+  {
+    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
+    "count": 5,
+  }
+];
 
 
 export class MainScreen extends React.Component {
@@ -28,29 +48,8 @@ export class MainScreen extends React.Component {
                   <Text style={styles.title}>{users[Math.floor(Math.random()*users.length)]}</Text>
                   <Text style={styles.titleDate}>5h ago</Text>
                 </View>
-                <Text style={styles.text}>{items[Math.floor(Math.random()*items.length)]}{items[Math.floor(Math.random()*items.length)]}</Text>
-                <View style={styles.reactionsContainer}>
-                    <View>
-                      <Text style={{ fontSize: 30 }}>😀</Text>
-                    </View>
-                    <View style={styles.reactCount}>
-                      <Text>500</Text>
-                    </View>
-
-                    <View>
-                      <Text style={{ fontSize: 30 }}>❤️‍</Text>
-                    </View>
-                    <View style={styles.reactCount}>
-                      <Text>5</Text>
-                    </View>
-
-                    <View>
-                      <Text style={{ fontSize: 30 }}>😄️‍</Text>
-                    </View>
-                    <View style={styles.reactCount}>
-                      <Text>5</Text>
-                    </View>
-                </View> 
+                <Text style={styles.text}>{emojiItems[Math.floor(Math.random()*emojiItems.length)]}{emojiItems[Math.floor(Math.random()*emojiItems.length)]}</Text>
+                <Reactions reactions={data} />
                 <Divider />
               </View>
             )
@@ -71,20 +70,6 @@ const styles = StyleSheet.create({
   },
   reactionsContainer: {
     flexDirection: "row",
-    marginBottom: 20
-  },
-  reactCount: { 
-      top: 22, 
-      left: -20, 
-      paddingLeft: 4, 
-      paddingRight: 4,
-      height: 23,
-      position: "relative",
-      backgroundColor: 'white', 
-      borderColor: '#efefef', 
-      borderWidth: 1, 
-      borderRadius: 20,
-      marginRight: -20
   },
   title: {
     fontWeight: 'bold',
