@@ -1,4 +1,7 @@
-all:
+app:
+	docker-compose up --build
+
+local:
 	pipenv install
 	FLASK_APP=yelmis pipenv run flask run
 
