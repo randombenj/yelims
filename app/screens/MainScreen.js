@@ -14,32 +14,6 @@ import EmojiInput from 'react-native-emoji-input';
 import { Divider, Button } from 'react-native-elements';
 import { Reactions } from '../components/reactions';
 const CONFIG = require('../config');
-
-let emojiItems = [
-  "😀","😁", "😂", "🤣", "😃", "😄", "😇", "🤠", "🤡", "😸", "😹", "😻",
-  "👫", "👭", "👬", "💑","👩", "❤️‍", "👩", "💩", "💩"
-]
-
-const data = [
-  {
-    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
-    "count": 5,
-  },
-  {
-    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
-    "count": 5,
-  },
-  {
-    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
-    "count": 5,
-  },
-  {
-    'emoji': emojiItems[Math.floor(Math.random()*emojiItems.length)],
-    "count": 5,
-  }
-];
-
-
 const limit = 10;
 const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
   const paddingToBottom = 20;
@@ -68,18 +42,17 @@ export class MainScreen extends React.Component {
     this._load();
   }
 
+  _chooseReactionHandler = (postId) => {
+    this.setState({
+      postId: postId,
+      edit: true
+    });
+  }
+
   _load() {
     return fetch(CONFIG.API_URL + 'posts?offset=' + this.state.offset +  '&limit=' + limit)
       .then((response) => response.json())
       .then((responseJson) => {
-        /*if (this.state.posts) {
-          let posts = this.state.posts.concat(
-            responseJson.posts
-          );
-        }
-        else {
-          let posts = responseJson.posts;
-        }*/
         let posts = this.state.posts.concat(responseJson.posts);
         let offset = this.state.offset + limit;
         this.setState({
@@ -92,23 +65,40 @@ export class MainScreen extends React.Component {
         });
       })
       .catch((error) => {
-        /*this.setState({
-          isLoading: false,
-          refreshing: false,
-          posts: [
-            {
-              _id: {
-                $oid: "5b9ce382e6ce4f000868e150"
-              },
-              username: "page_not_working",
-              message: "😥😥",
-              timestamp: {
-                $date: 1537008514444
-              },
-              reactions: [ ]
-            }]
-        });*/
+        console.error(error);
       });
+  }
+
+  _addReaction = (postId, emoji) => {
+    console.log("call to _addReaction");
+    console.log("postid: ", postId);
+    console.log("reaction: ", emoji);
+    let count = this.state.count + 1;
+    fetch(CONFIG.API_URL + 'posts/' + postId + '/' + 'reaction', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: 'test',
+            message: emoji,
+        })
+    })
+    .then((response) => response.json())
+    .then((json) => {
+      console.log("GOT RESP: ", json);
+      let posts = this.state.posts;
+      let post = posts.find(p => p._id.$oid == postId);
+      let index = posts.indexOf(post);
+      console.log("INDEX: ", index);
+      posts[index] = json;
+      this.setState({
+          posts: posts
+      });
+    })
+    .catch((err) => {
+        console.log(err);
+    });
   }
 
   componentDidMount(){
@@ -119,37 +109,20 @@ export class MainScreen extends React.Component {
     const { navigation } = this.props;
     const authtoken = navigation.getParam('authtoken', undefined);
     const authrefresh = navigation.getParam('authrefresh', undefined);
-    if (false) {
+    if (this.state.edit) {
       return (
         <EmojiInput onEmojiSelected={(emoji) => {
-          this.state.emoji = emoji;
+          console.log(emoji);
+          this._addReaction(this.state.postId, emoji.char);
+          this.setState({
+            edit: false
+          })
         }}
         keyboardBackgroundColor={"white"}
         enableFrequentlyUsedEmoji={true}
         enableSearch={false} />
       )
-    } else {
-      return (
-        <TouchableOpacity
-          style={{
-            borderWidth:1,
-            borderColor:'rgba(0,0,0,1)',
-            alignItems:'center',
-            justifyContent:'center',
-            width:100,
-            height:100,
-            backgroundColor:'#7a0068',
-            borderRadius: 50,
-            position: "absolute",
-            bottom: 5,
-            right: 5
-          }}
-        >
-          <Text style={{fontSize: 40}}>✍️</Text>
-        </TouchableOpacity>
-      )
-    }
-   
+    }  
   }
 
   render() {
@@ -180,7 +153,7 @@ export class MainScreen extends React.Component {
         }
       >
         {
-          this.state.posts.map((post) =>  
+          this.state.posts.map((post) =>
             (
               <View key={post._id.$oid}>
                 <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
@@ -188,7 +161,12 @@ export class MainScreen extends React.Component {
                   <Text style={styles.titleDate}>5h ago</Text>
                 </View>
                 <Text style={styles.reaction}>{post.message}</Text>
-                <Reactions reactions={data} />
+                <Reactions  
+                  postId={post._id.$oid} 
+                  reactions={post.reaction_summary} 
+                  handler={this._chooseReactionHandler} 
+                  addreaction={this._addReaction}
+                />
                 <Divider />
               </View>
             )

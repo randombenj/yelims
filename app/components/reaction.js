@@ -1,17 +1,33 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableHighlight } from 'react-native';
 
 export class Reaction extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            count: props.count
+        };
+        console.log("Init Reaction: ", props);
+    }
     render() {
       return (
-        <View style={styles.container}>
-            <View>
-                <Text style={styles.emoji}>{this.props.emoji}</Text>
+        <TouchableHighlight
+            onPress={() => {
+                console.log("going to call addreaction ...");
+                console.log("postid: ", this.props.postId)
+                this.state.count++;
+                this.props.addreaction(this.props.postId, this.props.emoji);
+            }}
+        >
+            <View style={styles.container}>
+                <View>
+                    <Text style={styles.emoji}>{this.props.emoji}</Text>
+                </View>
+                <View style={styles.count}>
+                    <Text>{this.state.count}</Text>
+                </View>
             </View>
-            <View style={styles.count}>
-                <Text>{this.props.count}</Text>
-            </View>
-        </View>
+        </TouchableHighlight>
       );
     }
 }
