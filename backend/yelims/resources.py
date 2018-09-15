@@ -44,23 +44,68 @@ def list_posts():
     })
 
 
+@posts_api.route("/near", methods=["GET"])
+def list_near_posts():
+    raw_args = request.args
+    try:
+        longitude = float(raw_args["longitude"])
+        latitude = float(raw_args["latitude"])
+        radius = float(raw_args.get("radius", 5))
+    except KeyError as exc:
+        raise ApiError(f"Missing URL parameter {exc}")
+
+    METERS_PER_MILE = 1609.34
+    posts_query = current_app.mongo.db.posts.find({
+        "location": {
+            "$nearSphere": {
+                "$geometry": {
+                    "type": "Point",
+                    "coordinates": [longitude, latitude]
+                },
+                "$maxDistance": radius * METERS_PER_MILE
+            }
+        }
+    })
+    total_posts = current_app.mongo.db.posts.count()
+    posts = list(posts_query)
+
+    for post in posts:
+        post["reaction_summary"] = sorted([
+                (k, len(list(v))) for k, v
+                in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+                ], key=lambda x: x[1], reverse=True)
+
+    return dumps({
+        "total": total_posts,
+        "posts": posts
+    })
+
+
 @posts_api.route("/", methods=["POST"])
 @jwt_required
 def insert_post():
+    current_user = get_jwt_identity()
     raw_post = request.json
     try:
-        username = raw_post["username"]
         message = raw_post["message"]
+        longitude = float(raw_post["longitude"])
+        latitude = float(raw_post["latitude"])
     except KeyError as exc:
         raise ApiError(f"Missing field {exc} in JSON body")
 
     if emoji.emoji_count(message) != 2:
         raise ApiError("Exactly 2 emojis needed for post message")
 
+    username = current_user["username"]
+
     post = {
         "username": username,
         "message": message,
         "timestamp": datetime.now(),
+        "location": {
+            "type": "Point",
+            "coordinates": [longitude, latitude]
+        },
         "reactions": [],
     }
     post_id = current_app.mongo.db.posts.insert_one(post).inserted_id
@@ -68,12 +113,14 @@ def insert_post():
 
 
 @posts_api.route("/<ObjectId:post_id>/reaction", methods=["POST"])
-# @jwt_required
+@jwt_required
 def add_reaction(post_id):
     raw_reaction = request.json
+    current_user = get_jwt_identity()
+    username = current_user["username"]
     try:
         reaction = {
-            "username": raw_reaction["username"],
+            "username": username,
             "message": raw_reaction["message"],
             "timestamp": datetime.now()
         }
@@ -81,12 +128,12 @@ def add_reaction(post_id):
         raise ApiError(f"Missing field {exc} in JSON body")
 
     user_already_reacted = current_app.mongo.db.posts.find_one(
-            {"_id": post_id, "reactions.username": raw_reaction["username"]})
+            {"_id": post_id, "reactions.username": username})
     if user_already_reacted:
         current_app.mongo.db.posts.update_one(
                 {"_id": post_id},
                 {"$pull": {"reactions": {
-                    "username": raw_reaction["username"]}}})
+                    "username": username}}})
 
     current_app.mongo.db.posts.update_one(
             {"_id": post_id}, {"$push": {"reactions": reaction}})
@@ -94,7 +141,8 @@ def add_reaction(post_id):
     post = current_app.mongo.db.posts.find_one({"_id": post_id})
     post["reaction_summary"] = sorted([
             (k, len(list(v))) for k, v
-            in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+            in itertools.groupby(
+                sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
             ], key=lambda x: x[1], reverse=True)
     return dumps(post)
 
@@ -120,7 +168,8 @@ def following_timeline():
     for post in posts:
         post["reaction_summary"] = sorted([
                 (k, len(list(v))) for k, v
-                in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+                in itertools.groupby(
+                    sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
                 ], key=lambda x: x[1], reverse=True)
 
     return dumps({
@@ -163,14 +212,26 @@ def user_timeline(username):
 
 
 @users_api.route("/", methods=["GET"])
-# @jwt_required
+@jwt_required
 def search_user():
+    current_user = get_jwt_identity()
     username = request.args.get("username", "")
+    following = list(current_app.mongo.db.users.find(
+        {"username": current_user["username"]},
+        {"following": 1, "_id": 0}))[0]["following"]
 
-    users = current_app.mongo.db.users.find(
+
+    users_raw = current_app.mongo.db.users.find(
             {"username": {"$regex": username, "$options": "i"}}).sort("username")
+    users = []
+    for user in users_raw:
+        users.append({
+            "username": user["username"],
+            "following": user["username"] in following
+        })
+
     return dumps({
-        "users": [u["username"] for u in users]
+        "users": users
     })
 
 
@@ -189,17 +250,19 @@ def user_profile(username):
     })
 
 
-@users_api.route("/<string:username>/follow/<string:new_follow_username>", methods=["PUT"])
+@users_api.route("/<string:new_follow_username>/follow", methods=["PUT"])
 @jwt_required
-def follow(username, new_follow_username):
+def follow(new_follow_username):
+    username = get_jwt_identity()["username"]
     current_app.mongo.db.users.update_one({"username": username}, {
         "$push": {"following": new_follow_username}}, upsert=True)
     return jsonify({}), 201
 
 
-@users_api.route("/<string:username>/follow/<string:follow_username>", methods=["DELETE"])
+@users_api.route("/<string:follow_username>/follow", methods=["DELETE"])
 @jwt_required
-def unfollow(username, follow_username):
+def unfollow(follow_username):
+    username = get_jwt_identity()["username"]
     current_app.mongo.db.users.update_one({"username": username}, {
         "$pull": {"following": follow_username}})
     return jsonify({}), 200
