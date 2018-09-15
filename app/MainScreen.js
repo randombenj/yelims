@@ -1,5 +1,12 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Text, View } from 'react-native';
+import { 
+  StyleSheet,
+  ScrollView,
+  Text,
+  View,
+  RefreshControl,
+  ActivityIndicator 
+} from 'react-native';
 
 import { Divider } from 'react-native-elements';
 import { Reactions } from './components/reactions';
@@ -7,10 +14,6 @@ import { Reactions } from './components/reactions';
 let emojiItems = [
   "😀","😁", "😂", "🤣", "😃", "😄", "😇", "🤠", "🤡", "😸", "😹", "😻",
   "👫", "👭", "👬", "💑","👩", "❤️‍", "👩", "💩", "💩"
-]
-
-let users = [
-  "@randombenj", "@fliiiix", "@tuxtimo", "@eddex", "@murc"
 ]
 
 const data = [
@@ -37,21 +40,69 @@ export class MainScreen extends React.Component {
   static navigationOptions = {
     title: 'YELIMS',    
   };
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true, 
+      refreshing: false 
+    }
+  }
+
+  _onRefresh = () => {
+    this.state.refreshing = true;
+    this._load();
+  }
+
+  _load() {
+    return fetch('http://192.168.43.56/posts/')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          isLoading: false,
+          refreshing: false,
+          posts: responseJson.posts,
+        }, function(){
+
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  componentDidMount(){
+    this._load();
+  }
+
   render() {
+    if(this.state.isLoading){
+      return(
+        <View style={[styles.container, styles.horizontal, {paddingTop: 150}]}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )
+    }
+
     return (
       <ScrollView
-        contentContainerStyle={{alignItems: 'center', justifyContent: 'center',}} 
+        contentContainerStyle={styles.contentContainer} 
         style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this._onRefresh}
+          />
+        }
       >
         {
-          Array.from({length: 20}, (x, i) => 
+          this.state.posts.map((post) =>  
             (
-              <View key={i}>
+              <View key={post._id.$oid}>
                 <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
-                  <Text style={styles.title}>{users[Math.floor(Math.random()*users.length)]}</Text>
+                  <Text style={styles.title}>@{post.username}</Text>
                   <Text style={styles.titleDate}>5h ago</Text>
                 </View>
-                <Text style={styles.text}>{emojiItems[Math.floor(Math.random()*emojiItems.length)]}{emojiItems[Math.floor(Math.random()*emojiItems.length)]}</Text>
+                <Text style={styles.reaction}>{post.message}</Text>
                 <Reactions reactions={data} />
                 <Divider />
               </View>
@@ -71,6 +122,10 @@ const styles = StyleSheet.create({
     margin: 10,
     marginRight: 10
   },
+  contentContainer: {
+    alignItems: 'center',
+     justifyContent: 'center'
+  },
   reactionsContainer: {
     flexDirection: "row",
   },
@@ -86,6 +141,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: "#efefef"
   },
-  text: {
-    fontSize: 120  }
+  reaction: {
+    fontSize: 120  
+  }
 });
