@@ -9,6 +9,7 @@ python_version = "3.7"
 [packages]
 flask = "*"
 flask-restful = "*"
+flask-pymongo = "*"
 gunicorn = "*"
 
 [dev-packages]
