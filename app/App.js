@@ -7,13 +7,16 @@ import { MapScreen } from './screens/MapScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { LoginScreen } from './screens/LoginScreen';
+import { AddScreen } from './screens/AddScreen';
+
 
 const App = createBottomTabNavigator({
+  Login: { screen: LoginScreen },
   Home: { screen: MainScreen },
   Map: { screen: MapScreen },
   Search: { screen: SearchScreen },
   Profile: { screen: ProfileScreen },
-  Login: { screen: LoginScreen },
+  Add: { screen: AddScreen },
 },
 {
   navigationOptions: ({ navigation }) => ({
