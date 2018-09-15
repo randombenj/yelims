@@ -141,6 +141,18 @@ def search_user():
     })
 
 
+@users_api.route("/<string:username>", methods=["GET"])
+@jwt_required
+def user_profile(username):
+    posts = list(current_app.mongo.db.posts.find({"username": username}))
+    attention_points = sum(len(x["reactions"]) for x in posts)
+    return dumps({
+        "username": username,
+        "post_count": len(posts),
+        "attention_points": attention_points
+    })
+
+
 @users_api.route("/<string:username>/follow/<string:new_follow_username>", methods=["PUT"])
 @jwt_required
 def new_follow(username, new_follow_username):
