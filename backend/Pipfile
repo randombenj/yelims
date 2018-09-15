@@ -8,8 +8,11 @@ python_version = "3.7"
 
 [packages]
 flask = "*"
-flask-restful = "*"
 flask-pymongo = "*"
+flask-jwt-extended = "*"
+flask-bcrypt = "*"
+jsonschema = "*"
+emoji = "*"
 gunicorn = "*"
 
 [dev-packages]

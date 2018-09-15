@@ -1,3 +1,3 @@
-from yelmis import make_app
+from yelims import make_app
 
 app = make_app()
