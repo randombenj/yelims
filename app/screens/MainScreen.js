@@ -107,9 +107,6 @@ export class MainScreen extends React.Component {
   }
 
   renderEdit() {
-    const { navigation } = this.props;
-    const authtoken = navigation.getParam('authtoken', undefined);
-    const authrefresh = navigation.getParam('authrefresh', undefined);
     if (this.state.edit) {
       return (
         <EmojiInput onEmojiSelected={(emoji) => {

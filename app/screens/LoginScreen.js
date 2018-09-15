@@ -42,10 +42,9 @@ export class LoginScreen extends React.Component {
                 if (responseJson.ok) {
                     console.log("user login");
                     console.log(responseJson);
-                    this.props.navigation.navigate('Home', {
-                        authtoken: responseJson.data.token,
-                        authrefresh: responseJson.data.refresh
-                    });
+                    this.props.navigation.navigate('Home');
+                    CONFIG.API_TOKEN = responseJson.data.token
+                    CONFIG.API_REFRESH = responseJson.data.refresh
                 } else {
                     console.error(responseJson);
                 }
