@@ -12,11 +12,11 @@ import { AddScreen } from './screens/AddScreen';
 
 const App = createBottomTabNavigator({
   Home: { screen: MainScreen },
+  Add: { screen: AddScreen },
   Map: { screen: MapScreen },
   Search: { screen: SearchScreen },
   Profile: { screen: ProfileScreen },
   Logout: { screen: LoginScreen },
-  Add: { screen: AddScreen },
 },
 {
   navigationOptions: ({ navigation }) => ({
@@ -33,6 +33,8 @@ const App = createBottomTabNavigator({
         iconName = 'md-analytics';
       } else if (routeName === 'Logout') {
         iconName = 'ios-key';
+      } else if (routeName === 'Add') {
+        iconName = 'md-add-circle';
       }
 
       // You can return any component that you like here! We usually use an
