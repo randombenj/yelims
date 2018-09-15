@@ -14,7 +14,7 @@ const CONFIG = require('../config');
 
 export class LoginScreen extends React.Component {
     static navigationOptions = {
-        title: 'Login',
+        title: 'Logout',
         tabBarVisible: false,
     };
     constructor(props) {
@@ -81,11 +81,9 @@ export class LoginScreen extends React.Component {
     };
     handle_user = (text) => {
         this.setState({ user: text })
-        console.log(this.state.user);
     };
     handle_pass = (text) => {
         this.setState({ pass: text })
-        console.log(this.state.pass);
     };
     render() {
         return (
@@ -113,7 +111,7 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         margin: 10,
         marginRight: 10,
-        paddingTop: 15
+        paddingTop: 30
     },
     contentContainer: {
         alignItems: 'center',
