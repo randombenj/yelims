@@ -7,8 +7,9 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
-  Icon
 } from 'react-native';
+
+import EmojiInput from 'react-native-emoji-input';
 
 import { Divider, Button } from 'react-native-elements';
 import { Reactions } from '../components/reactions';
@@ -37,6 +38,12 @@ const data = [
   }
 ];
 
+const limit = 10;
+const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+  const paddingToBottom = 20;
+  return layoutMeasurement.height + contentOffset.y >=
+    contentSize.height - paddingToBottom;
+};
 
 export class MainScreen extends React.Component {
   static navigationOptions = {
@@ -46,29 +53,44 @@ export class MainScreen extends React.Component {
     super(props);
     this.state = {
       isLoading: true, 
-      refreshing: false 
+      refreshing: false,
+      offset: 0,
+      posts: []
     }
   }
 
   _onRefresh = () => {
+    this.state.offset = 0;
+    this.state.posts = [];
     this.state.refreshing = true;
     this._load();
   }
 
   _load() {
-    return fetch('http://192.168.43.56/posts/')
+    return fetch('http://192.168.43.56/posts?offset=' + this.state.offset +  '&limit=' + limit)
       .then((response) => response.json())
       .then((responseJson) => {
+        /*if (this.state.posts) {
+          let posts = this.state.posts.concat(
+            responseJson.posts
+          );
+        }
+        else {
+          let posts = responseJson.posts;
+        }*/
+        let posts = this.state.posts.concat(responseJson.posts);
+        let offset = this.state.offset + limit;
         this.setState({
           isLoading: false,
           refreshing: false,
-          posts: responseJson.posts,
+          offset: offset,
+          posts: posts,
         }, function(){
 
         });
       })
       .catch((error) => {
-        this.setState({
+        /*this.setState({
           isLoading: false,
           refreshing: false,
           posts: [
@@ -83,12 +105,46 @@ export class MainScreen extends React.Component {
               },
               reactions: [ ]
             }]
-        });
+        });*/
       });
   }
 
   componentDidMount(){
     this._load();
+  }
+
+  renderEdit() {
+    if (false) {
+      return (
+        <EmojiInput onEmojiSelected={(emoji) => {
+          this.state.emoji = emoji;
+        }}
+        keyboardBackgroundColor={"white"}
+        enableFrequentlyUsedEmoji={true}
+        enableSearch={false} />
+      )
+    } else {
+      return (
+        <TouchableOpacity
+          style={{
+            borderWidth:1,
+            borderColor:'rgba(0,0,0,1)',
+            alignItems:'center',
+            justifyContent:'center',
+            width:100,
+            height:100,
+            backgroundColor:'#7a0068',
+            borderRadius: 50,
+            position: "absolute",
+            bottom: 5,
+            right: 5
+          }}
+        >
+          <Text style={{fontSize: 40}}>✍️</Text>
+        </TouchableOpacity>
+      )
+    }
+   
   }
 
   render() {
@@ -105,6 +161,12 @@ export class MainScreen extends React.Component {
       <ScrollView
         contentContainerStyle={styles.contentContainer} 
         style={styles.container}
+        onScroll={({nativeEvent}) => {
+          if (isCloseToBottom(nativeEvent)) {
+            this._load();
+          }
+        }}
+        scrollEventThrottle={400}
         refreshControl={
           <RefreshControl
             refreshing={this.state.refreshing}
@@ -128,23 +190,7 @@ export class MainScreen extends React.Component {
           )
         }
       </ScrollView>
-      <TouchableOpacity
-          style={{
-              borderWidth:1,
-              borderColor:'rgba(0,0,0,1)',
-              alignItems:'center',
-              justifyContent:'center',
-              width:100,
-              height:100,
-              backgroundColor:'#7a0068',
-              borderRadius: 50,
-              position: "absolute",
-              bottom: 5,
-              right: 5
-            }}
-        >
-          <Text style={{fontSize: 40}}>✍️</Text>
-        </TouchableOpacity>
+      {this.renderEdit()}
       </View>
     );
   }
