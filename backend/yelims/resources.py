@@ -146,16 +146,27 @@ def search_user():
 def user_profile(username):
     posts = list(current_app.mongo.db.posts.find({"username": username}))
     attention_points = sum(len(x["reactions"]) for x in posts)
+    following = list(current_app.mongo.db.users.find({"username": username}))[0]["following"]
+    print(following)
     return dumps({
         "username": username,
         "post_count": len(posts),
-        "attention_points": attention_points
+        "attention_points": attention_points,
+        "following": following
     })
 
 
 @users_api.route("/<string:username>/follow/<string:new_follow_username>", methods=["PUT"])
 @jwt_required
-def new_follow(username, new_follow_username):
+def follow(username, new_follow_username):
     current_app.mongo.db.users.update_one({"username": username}, {
         "$push": {"following": new_follow_username}}, upsert=True)
     return jsonify({}), 201
+
+
+@users_api.route("/<string:username>/follow/<string:follow_username>", methods=["DELETE"])
+@jwt_required
+def unfollow(username, follow_username):
+    current_app.mongo.db.users.update_one({"username": username}, {
+        "$pull": {"following": follow_username}})
+    return jsonify({}), 200
