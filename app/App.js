@@ -1,11 +1,15 @@
 import {
-  createStackNavigator,
+  createBottomTabNavigator,
 } from 'react-navigation';
 import { MainScreen } from './MainScreen';
-import { MapScreen } from './MapScreen';
+import { MapScreen } from './screens/MapScreen';
+import { SearchScreen } from './screens/SearchScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
 
-const App = createStackNavigator({
+const App = createBottomTabNavigator({
   Home: { screen: MainScreen },
-  Map: { screen: MapScreen },  
+  Map: { screen: MapScreen },
+  Search: { screen: SearchScreen },
+  Profile: { screen: ProfileScreen },
 });
 export default App;

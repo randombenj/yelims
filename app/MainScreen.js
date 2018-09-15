@@ -34,6 +34,9 @@ const data = [
 
 
 export class MainScreen extends React.Component {
+  static navigationOptions = {
+    title: 'YELIMS',    
+  };
   render() {
     return (
       <ScrollView
