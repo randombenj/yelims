@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import { SearchBar, ListItem, Icon } from 'react-native-elements'
+import { SearchBar, ListItem, Icon } from 'react-native-elements';
 
 const CONFIG = require('../config');
+const token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzcwMTY4NzgsIm5iZiI6MTUzNzAxNjg3OCwianRpIjoiZjMyOTZlOWEtYTZhMi00M2UxLWFlY2QtMWJmOWRlYzczZjAyIiwiZXhwIjoxNTM3MTAzMjc4LCJpZGVudGl0eSI6eyJ1c2VybmFtZSI6IlRpbW8ifSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.88dpEexIKFiSIloaJtKUc5KMGZvDvb2cHFwjM8iD5u0';
 
 export class SearchScreen extends React.Component {
   static navigationOptions = {
@@ -12,25 +13,32 @@ export class SearchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: ["type something to find peace",],
+      users: [],
       usersLoaded: false,
+      lastSearchText: '',
     }
   }
 
   loadUsers = (text) => {
     if(text == '') {
       this.setState({ 
-        users: ["enter a username in the search bar to start.",],
-        isResult: false,
+        users: ["Enter a username in the search bar to start.",],
+        usersLoaded: false,
+        lastSearchText: '',
       });
       return;
     }
-    return fetch(CONFIG.API_URL + 'users?username=' + text)
+    return fetch(CONFIG.API_URL + 'users?username=' + text, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      }})
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
           users: responseJson.users,
-          isResult: true,
+          usersLoaded: true,
+          lastSearchText: text,
         }, function () {
 
         });
@@ -38,41 +46,71 @@ export class SearchScreen extends React.Component {
       .catch((error) => {
         console.log(error);
         this.setState({ 
-          users: ["no users found..",],
-          isResult: false,
+          users: ["No users found..",],
+          usersLoaded: false,
+          lastSearchText: '',
         });
       });
   };
 
-  onButtonPress = () => {
+  onButtonPress = (user) => {
+    console.log('onButtonPress:');
+    console.log(user);
+    if(user.following) {
+      this.setFollowingForUser(user.username, 'DELETE');
+      this.loadUsers(this.state.lastSearchText);
+    } else {
+      this.setFollowingForUser(user.username, 'PUT');
+      this.loadUsers(this.state.lastSearchText);
+    }
+  }
 
+  setFollowingForUser(username, method) {
+    fetch(CONFIG.API_URL + 'users/' + username + '/follow', {
+      method: method,
+      headers: {
+        Authorization: token,
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
+  getIconColorFromFollowState = (following) => {
+    if(following) {
+      return 'red';
+    } else {
+      return 'grey';
+    }
   }
 
   getListItems = (item) => {
     console.log(item);
     console.log(this.state.usersLoaded);
     if(this.state.usersLoaded) {
-        return (
-          <ListItem style={styles.listItem}
-            rightIcon={<Icon
-              raised
-              name='heart'
-              type='font-awesome'
-              color='red'
-              onPress={this.onButtonPress}
-              />}
-            key={item.item}
-            title={'@' + item.item}
-          />
-        )
+      return (
+        <ListItem style={styles.listItem}
+          rightIcon={<Icon
+            raised
+            name='heart'
+            type='font-awesome'
+            color={this.getIconColorFromFollowState(item.item.following)}
+            onPress={() => this.onButtonPress(item.item)}
+            />
+          }
+          key={item.item.username}
+          title={'@' + item.item.username}
+        />
+      )
     } else {
-        return (
-          <ListItem style={styles.listItem}
-            hideChevron
-            key={item.item}
-            title={item.item}
-          />
-        )
+      return (
+        <ListItem style={styles.listItem}
+          hideChevron
+          key={item.item}
+          title={item.item}
+        />
+      )
     }
   }
 
