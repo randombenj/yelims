@@ -15,9 +15,18 @@ const CONFIG = require('../config');
 export class LoginScreen extends React.Component {
     static navigationOptions = {
         title: 'Login',
+        tabBarVisible: false,
     };
-    _login() {
-        console.log("username: " + this.state.user + "pass: " + this.state.pass);
+    constructor(props) {
+        super(props);
+
+        this.state = {
+          user: '',
+          pass: '',
+        };
+      };
+    _login = ()  =>  {
+        console.log("Login: username: " + this.state.user + "pass: " + this.state.pass);
         fetch(CONFIG.API_URL + 'auth', {
                 method: 'POST',
                 headers: {
@@ -45,8 +54,8 @@ export class LoginScreen extends React.Component {
                 console.error(error);
             });
     };
-    _signup() {
-        console.log("username: " + this.state.user + "pass: " + this.state.pass);
+    _signup = ()  => {
+        console.log("Signup: username: " + this.state.user + "pass: " + this.state.pass);
         fetch(CONFIG.API_URL + '/register', {
                 method: 'POST',
                 headers: {
@@ -71,14 +80,12 @@ export class LoginScreen extends React.Component {
             });
     };
     handle_user = (text) => {
-        this.setState({
-            user: text
-        })
+        this.setState({ user: text })
+        console.log(this.state.user);
     };
     handle_pass = (text) => {
-        this.setState({
-            pass: text
-        })
+        this.setState({ pass: text })
+        console.log(this.state.pass);
     };
     render() {
         return (
@@ -86,13 +93,13 @@ export class LoginScreen extends React.Component {
             <Text style={styles.title}>📓😀</Text>
 
             <FormLabel>Username</FormLabel>
-            <FormInput onChangeText = {this.handle_user} />
+            <FormInput onChangeText={this.handle_user} />
 
             <FormLabel>Password</FormLabel>
-            <FormInput onChangeText = {this.handle_pass} />
+            <FormInput onChangeText={this.handle_pass} />
 
-            <Button onPress={this._login()} buttonStyle={styles.login} rightIcon={{name: 'arrow-forward'}} title='Login' />
-            <Button onPress={this._signup()} buttonStyle={styles.login} rightIcon={{name: 'arrow-forward'}} title='Sign up' />
+            <Button onPress={this._login} buttonStyle={styles.login} rightIcon={{name: 'arrow-forward'}} title='Login' />
+            <Button onPress={this._signup} buttonStyle={styles.login} rightIcon={{name: 'arrow-forward'}} title='Sign up' />
             </View>
         );
     }
