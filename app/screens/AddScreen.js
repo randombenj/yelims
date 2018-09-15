@@ -37,7 +37,7 @@ export class AddScreen extends React.Component {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzcwMzM5NjYsIm5iZiI6MTUzNzAzMzk2NiwianRpIjoiYjRiNTJmMDQtNDRhOS00ODUyLWJiZWMtZjRhODMxNmQ1OTRlIiwiZXhwIjoxNTM3MTIwMzY2LCJpZGVudGl0eSI6eyJ1c2VybmFtZSI6ImZsZXgifSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.tWhtwwS2ABds17yafoZ4fUPhlHxgtGyT71uSeoe8yiU'
+                    'Authorization': 'Bearer ' + CONFIG.API_TOKEN
                 },
                 body: JSON.stringify({
                     message: this.state.emoji,
