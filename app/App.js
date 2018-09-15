@@ -1,7 +1,7 @@
 import {
   createBottomTabNavigator,
 } from 'react-navigation';
-import { MainScreen } from './MainScreen';
+import { MainScreen } from './screens/MainScreen';
 import { MapScreen } from './screens/MapScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ProfileScreen } from './screens/ProfileScreen';

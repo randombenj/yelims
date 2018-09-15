@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import { Divider } from 'react-native-elements';
-import { Reactions } from './components/reactions';
+import { Reactions } from '../components/reactions';
 
 let emojiItems = [
   "😀","😁", "😂", "🤣", "😃", "😄", "😇", "🤠", "🤡", "😸", "😹", "😻",
