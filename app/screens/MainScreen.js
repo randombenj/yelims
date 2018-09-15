@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 15,
     fontStyle: 'italic',
-    color: "#efefef"
+    color: "#c7c7c7"
   },
   reaction: {
     fontSize: 120  
