@@ -20,32 +20,35 @@ export class AddScreen extends React.Component {
 
     handle_emoji = (text) => {
         this.setState({
-            emoji: this.state.emoji
+            emoji: this.state.emoji + text
         })
-        console.log(text);
     };
 
-    _post() {
-        console.log("emoji: " + this.state.user + "pass: " + this.state.pass);
-        fetch(CONFIG.API_URL + 'auth', {
+    handle_emoji_keyboard = (text) => {
+        this.setState({
+            emoji: text
+        })
+    };
+
+    _post = () => {
+        console.log("emoji: " + this.state.emoji);
+        fetch(CONFIG.API_URL + 'posts', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzcwMzM5NjYsIm5iZiI6MTUzNzAzMzk2NiwianRpIjoiYjRiNTJmMDQtNDRhOS00ODUyLWJiZWMtZjRhODMxNmQ1OTRlIiwiZXhwIjoxNTM3MTIwMzY2LCJpZGVudGl0eSI6eyJ1c2VybmFtZSI6ImZsZXgifSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.tWhtwwS2ABds17yafoZ4fUPhlHxgtGyT71uSeoe8yiU'
                 },
                 body: JSON.stringify({
-                    username: this.state.user,
-                    password: this.state.pass,
+                    message: this.state.emoji,
+                    longitude: "47.3898512",
+                    latitude: "8.5134361",
                 }),
             }).then((response) => response.json())
             .then((responseJson) => {
                 if (responseJson.ok) {
-                    console.log("user login");
+                    console.log("submited post");
                     console.log(responseJson);
-                    this.props.navigation.navigate('Home', {
-                        authtoken: responseJson.data.token,
-                        authrefresh: responseJson.data.refresh
-                    });
                 } else {
                     console.error(responseJson);
                 }
@@ -56,16 +59,15 @@ export class AddScreen extends React.Component {
     };
 
     render() {
-        this.emoji = "";
         return (
             <View style={[styles.container]}>
                 <FormLabel>Post</FormLabel>
-                <FormInput value={this.state.emoji} />
+                <FormInput value={this.state.emoji} onChangeText={this.handle_emoji_keyboard} />
                 <EmojiInput onEmojiSelected={(emoji) => this.handle_emoji(emoji.char)}
                 keyboardBackgroundColor={"white"}
                 enableFrequentlyUsedEmoji={true}
                 enableSearch={false} />
-                <Button onPress={this._post()} title='submit' />
+                <Button onPress={this._post} title='submit' />
             </View>
         ); 
     }
