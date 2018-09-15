@@ -13,11 +13,18 @@ export class SearchScreen extends React.Component {
     super(props);
     this.state = {
       users: ["type something to find peace",],
-      isResult: false,
+      usersLoaded: false,
     }
   }
 
   loadUsers = (text) => {
+    if(text == '') {
+      this.setState({ 
+        users: ["enter a username in the search bar to start.",],
+        isResult: false,
+      });
+      return;
+    }
     return fetch(CONFIG.API_URL + 'users?username=' + text)
       .then((response) => response.json())
       .then((responseJson) => {
@@ -43,8 +50,8 @@ export class SearchScreen extends React.Component {
 
   getListItems = (item) => {
     console.log(item);
-    console.log(this.state.isResult);
-    if(this.state.isResult) {
+    console.log(this.state.usersLoaded);
+    if(this.state.usersLoaded) {
         return (
           <ListItem style={styles.listItem}
             rightIcon={<Icon
@@ -71,7 +78,7 @@ export class SearchScreen extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.view}>
         <SearchBar
           round
           lightTheme
@@ -88,6 +95,9 @@ export class SearchScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  view: {
+    marginTop: 24,
+  },
   listItem: {
     flex: 1,
     backgroundColor: '#F5FCFF',
