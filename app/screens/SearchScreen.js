@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, FlatList } from 'react-native';
 import { SearchBar, ListItem } from 'react-native-elements'
+const CONFIG = require('../config');
 
 export class SearchScreen extends React.Component {
   static navigationOptions = {
@@ -15,7 +16,7 @@ export class SearchScreen extends React.Component {
   }
 
   loadUsers = (text) => {
-    return fetch('http://192.168.43.56/users?username=' + text)
+    return fetch(CONFIG.API_URL + 'users?username=' + text)
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({

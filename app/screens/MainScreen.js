@@ -13,6 +13,7 @@ import EmojiInput from 'react-native-emoji-input';
 
 import { Divider, Button } from 'react-native-elements';
 import { Reactions } from '../components/reactions';
+const CONFIG = require('../config');
 
 let emojiItems = [
   "😀","😁", "😂", "🤣", "😃", "😄", "😇", "🤠", "🤡", "😸", "😹", "😻",
@@ -68,7 +69,7 @@ export class MainScreen extends React.Component {
   }
 
   _load() {
-    return fetch('http://192.168.43.56/posts?offset=' + this.state.offset +  '&limit=' + limit)
+    return fetch(CONFIG.API_URL + 'posts?offset=' + this.state.offset +  '&limit=' + limit)
       .then((response) => response.json())
       .then((responseJson) => {
         /*if (this.state.posts) {
