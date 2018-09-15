@@ -3,7 +3,7 @@ import { Button } from 'react-native';
 
 export class MapScreen extends React.Component {
     static navigationOptions = {
-      title: 'Welcome',
+      title: 'Map',
     };
     render() {
       const { navigate } = this.props.navigation;
