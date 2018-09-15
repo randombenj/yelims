@@ -3,7 +3,6 @@ import { View, FlatList, StyleSheet } from 'react-native';
 import { SearchBar, ListItem, Icon } from 'react-native-elements';
 
 const CONFIG = require('../config');
-const token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MzcwMTY4NzgsIm5iZiI6MTUzNzAxNjg3OCwianRpIjoiZjMyOTZlOWEtYTZhMi00M2UxLWFlY2QtMWJmOWRlYzczZjAyIiwiZXhwIjoxNTM3MTAzMjc4LCJpZGVudGl0eSI6eyJ1c2VybmFtZSI6IlRpbW8ifSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.88dpEexIKFiSIloaJtKUc5KMGZvDvb2cHFwjM8iD5u0';
 
 export class SearchScreen extends React.Component {
   static navigationOptions = {
@@ -31,7 +30,7 @@ export class SearchScreen extends React.Component {
     return fetch(CONFIG.API_URL + 'users?username=' + text, {
       method: 'GET',
       headers: {
-        Authorization: token,
+        Authorization: 'Bearer ' + CONFIG.API_TOKEN,
       }})
       .then((response) => response.json())
       .then((responseJson) => {
@@ -69,7 +68,7 @@ export class SearchScreen extends React.Component {
     fetch(CONFIG.API_URL + 'users/' + username + '/follow', {
       method: method,
       headers: {
-        Authorization: token,
+        Authorization: 'Bearer ' + CONFIG.API_TOKEN,
       }
     })
     .catch((error) => {
