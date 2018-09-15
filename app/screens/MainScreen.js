@@ -38,6 +38,7 @@ const data = [
   }
 ];
 
+
 const limit = 10;
 const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
   const paddingToBottom = 20;
@@ -114,6 +115,9 @@ export class MainScreen extends React.Component {
   }
 
   renderEdit() {
+    const { navigation } = this.props;
+    const authtoken = navigation.getParam('authtoken', undefined);
+    const authrefresh = navigation.getParam('authrefresh', undefined);
     if (false) {
       return (
         <EmojiInput onEmojiSelected={(emoji) => {
