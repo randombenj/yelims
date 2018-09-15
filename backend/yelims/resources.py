@@ -1,3 +1,4 @@
+import itertools
 from datetime import datetime
 
 import emoji
@@ -25,6 +26,12 @@ def list_posts():
             offset).limit(limit).sort("timestamp", pymongo.DESCENDING)
     total_posts = current_app.mongo.db.posts.count()
     posts = list(posts_query)
+
+    for post in posts:
+        post["reaction_summary"] = sorted([
+                (k, len(list(v))) for k, v
+                in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+                ], key=lambda x: x[1], reverse=True)
 
     return dumps({
         "_links": {
@@ -61,7 +68,7 @@ def insert_post():
 
 
 @posts_api.route("/<ObjectId:post_id>/reaction", methods=["POST"])
-@jwt_required
+# @jwt_required
 def add_reaction(post_id):
     raw_reaction = request.json
     try:
@@ -73,9 +80,23 @@ def add_reaction(post_id):
     except KeyError as exc:
         raise ApiError(f"Missing field {exc} in JSON body")
 
+    user_already_reacted = current_app.mongo.db.posts.find_one(
+            {"_id": post_id, "reactions.username": raw_reaction["username"]})
+    if user_already_reacted:
+        current_app.mongo.db.posts.update_one(
+                {"_id": post_id},
+                {"$pull": {"reactions": {
+                    "username": raw_reaction["username"]}}})
+
     current_app.mongo.db.posts.update_one(
             {"_id": post_id}, {"$push": {"reactions": reaction}})
-    return jsonify({"post_id": str(post_id)}), 204
+
+    post = current_app.mongo.db.posts.find_one({"_id": post_id})
+    post["reaction_summary"] = sorted([
+            (k, len(list(v))) for k, v
+            in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+            ], key=lambda x: x[1], reverse=True)
+    return dumps(post)
 
 
 @timeline_api.route("/", methods=["GET"])
@@ -95,6 +116,12 @@ def following_timeline():
                             "timestamp", pymongo.DESCENDING)
     total_posts = current_app.mongo.db.posts.count()
     posts = list(posts_query)
+
+    for post in posts:
+        post["reaction_summary"] = sorted([
+                (k, len(list(v))) for k, v
+                in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+                ], key=lambda x: x[1], reverse=True)
 
     return dumps({
         "_links": {
@@ -118,6 +145,12 @@ def user_timeline(username):
     total_posts = current_app.mongo.db.posts.count()
     posts = list(posts_query)
 
+    for post in posts:
+        post["reaction_summary"] = sorted([
+                (k, len(list(v))) for k, v
+                in itertools.groupby(sorted(post["reactions"], key=lambda x: x["message"]), key=lambda x: x["message"])
+                ], key=lambda x: x[1], reverse=True)
+
     return dumps({
         "_links": {
             "self": {"href": f"/timeline/{username}?offset={offset}&limit={limit}"},
@@ -135,7 +168,7 @@ def search_user():
     username = request.args.get("username", "")
 
     users = current_app.mongo.db.users.find(
-            {"username": {"$regex": username}}).sort("username")
+            {"username": {"$regex": username, "$options": "i"}}).sort("username")
     return dumps({
         "users": [u["username"] for u in users]
     })
@@ -146,8 +179,8 @@ def search_user():
 def user_profile(username):
     posts = list(current_app.mongo.db.posts.find({"username": username}))
     attention_points = sum(len(x["reactions"]) for x in posts)
-    following = list(current_app.mongo.db.users.find({"username": username}))[0]["following"]
-    print(following)
+    following = list(current_app.mongo.db.users.find(
+        {"username": username}))[0]["following"]
     return dumps({
         "username": username,
         "post_count": len(posts),
