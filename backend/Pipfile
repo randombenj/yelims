@@ -8,6 +8,7 @@ python_version = "3.7"
 
 [packages]
 flask = "*"
+flask-restful = "*"
 gunicorn = "*"
 
 [dev-packages]
