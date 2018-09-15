@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, FlatList } from 'react-native';
-import { SearchBar, ListItem } from 'react-native-elements'
+import { View, FlatList, StyleSheet } from 'react-native';
+import { SearchBar, ListItem, Icon } from 'react-native-elements'
+
 const CONFIG = require('../config');
 
 export class SearchScreen extends React.Component {
@@ -11,7 +12,8 @@ export class SearchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: ["type something to find peace",]
+      users: ["type something to find peace",],
+      isResult: false,
     }
   }
 
@@ -21,15 +23,51 @@ export class SearchScreen extends React.Component {
       .then((responseJson) => {
         this.setState({
           users: responseJson.users,
+          isResult: true,
         }, function () {
 
         });
       })
       .catch((error) => {
         console.log(error);
-        this.setState({ users: ["no users found..",] });
+        this.setState({ 
+          users: ["no users found..",],
+          isResult: false,
+        });
       });
   };
+
+  onButtonPress = () => {
+
+  }
+
+  getListItems = (item) => {
+    console.log(item);
+    console.log(this.state.isResult);
+    if(this.state.isResult) {
+        return (
+          <ListItem style={styles.listItem}
+            rightIcon={<Icon
+              raised
+              name='heart'
+              type='font-awesome'
+              color='red'
+              onPress={this.onButtonPress}
+              />}
+            key={item.item}
+            title={'@' + item.item}
+          />
+        )
+    } else {
+        return (
+          <ListItem style={styles.listItem}
+            hideChevron
+            key={item.item}
+            title={item.item}
+          />
+        )
+    }
+  }
 
   render() {
     return (
@@ -42,15 +80,17 @@ export class SearchScreen extends React.Component {
           placeholder='Search other yelims...' />
         <FlatList
           data={this.state.users}
-          renderItem={({ item }) =>
-            <ListItem
-              hideChevron
-              key={item}
-              title={item}
-            />
-          }
+          renderItem={(item) => this.getListItems(item)}
         />
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  listItem: {
+    flex: 1,
+    backgroundColor: '#F5FCFF',
+    fontSize: 20,
+  },
+});
