@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "expo": "^27.0.1",
+    "javascript-time-ago": "^1.0.31",
     "react": "16.3.1",
     "react-native": "~0.55.2",
     "react-native-emoji-input": "^1.1.8",
