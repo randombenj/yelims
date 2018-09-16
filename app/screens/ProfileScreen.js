@@ -27,13 +27,16 @@ export class ProfileScreen extends React.Component {
       }})
       .then((response) => response.json())
       .then((responseJson) => {
+
+        let followingList = responseJson.following.map(username => {
+          return {key: username, username: username};
+        });
         this.setState({
           username: responseJson.username,
           postCount: responseJson.post_count,
           attentionPoints: responseJson.attention_points,
-          following: responseJson.following,
+          following: followingList,
         }, function (){});
-        console.log(this.state.userProfile);
       })
       .catch((error) => {
         console.log(error);
@@ -41,7 +44,7 @@ export class ProfileScreen extends React.Component {
           username: "error",
           postCount: 0,
           attentionPoints: 0,
-          following: [],
+          following: {},
         });
       });
   }
@@ -61,13 +64,12 @@ export class ProfileScreen extends React.Component {
             color='red'
             />
           }
-          key={item.item}
-          title={'@' + item.item}
+          key={item.item.username}
+          title={'@' + item.item.key}
         />
     )
   }
 
-  // I think we need a 'key' property on the 'this.state.folowing' objects to get rid of the warning
   render() {
     return (
       <View style={styles.view}>
