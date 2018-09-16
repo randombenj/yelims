@@ -10,8 +10,12 @@ import {
 } from 'react-native';
 
 import EmojiInput from 'react-native-emoji-input';
-
 import { Divider, Button } from 'react-native-elements';
+import TimeAgo from 'javascript-time-ago'
+ 
+// Load locale-specific relative date/time formatting rules.
+import en from 'javascript-time-ago/locale/en'
+
 import { Reactions } from '../components/reactions';
 
 const CONFIG = require('../config');
@@ -22,6 +26,12 @@ const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
   return layoutMeasurement.height + contentOffset.y >=
     contentSize.height - paddingToBottom;
 };
+
+// Add locale-specific relative date/time formatting rules.
+TimeAgo.locale(en)
+ 
+// Create relative date/time formatter.
+const timeAgo = new TimeAgo('en-US');
 
 
 export class MainScreen extends React.Component {
@@ -53,7 +63,7 @@ export class MainScreen extends React.Component {
   }
 
   _load() {
-    
+
     console.log("TOKEN: ", CONFIG.API_TOKEN)
     return fetch(CONFIG.API_URL +
       'timeline?offset=' + 
@@ -169,7 +179,9 @@ export class MainScreen extends React.Component {
               <View key={post._id.$oid}>
                 <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
                   <Text style={styles.title}>@{post.username}</Text>
-                  <Text style={styles.titleDate}>5h ago</Text>
+                  <Text style={styles.titleDate}>
+                    {timeAgo.format(post.timestamp.$date)}
+                  </Text>
                 </View>
                 <Text style={styles.reaction}>{post.message}</Text>
                 <Reactions  
