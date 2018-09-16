@@ -229,6 +229,7 @@ def search_user():
     users = []
     for user in users_raw:
         users.append({
+            "key": str(user["_id"]),
             "username": user["username"],
             "following": user["username"] in following
         })
