@@ -28,3 +28,16 @@ section {
     font-family: 'Roboto', sans-serif;
 }
 
+.feature {
+    display: grid;
+    grid-template-columns: 60% 10% 30%;
+}
+
+.feature-right {
+    display: grid;
+    grid-template-columns: 30% 10% 60%;
+}
+
+hr {
+    color: gray;
+}
