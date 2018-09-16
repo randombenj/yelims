@@ -1,5 +1,5 @@
 module.exports = {
-	API_URL: "http://192.168.43.56/",
+	API_URL: "https://tuxtimo.me/yelims/",
 	API_TOKEN: "",
 	API_REFRESH: "",
 	USERNAME: "",
