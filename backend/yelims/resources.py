@@ -86,6 +86,7 @@ def list_near_posts():
 def insert_post():
     current_user = get_jwt_identity()
     raw_post = request.json
+    print(raw_post)
     try:
         message = raw_post["message"]
         longitude = float(raw_post["longitude"])
@@ -157,6 +158,8 @@ def following_timeline():
     following = list(current_app.mongo.db.users.find(
         {"username": current_user["username"]},
         {"following": 1, "_id": 0}))[0]["following"]
+
+    following.append(current_user["username"])
 
     posts_query = current_app.mongo.db.posts.find(
             {"username": {"$in": following}}).skip(
