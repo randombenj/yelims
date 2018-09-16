@@ -2,7 +2,8 @@ import React from 'react';
 import {
   StyleSheet,
   Image,
-  View
+  View,
+  Text
 } from 'react-native';
 
 import MapView, {
@@ -13,8 +14,8 @@ import marker from '../img/map-marker.png'
 const CONFIG = require('../config');
 
 
-const latitudeDelta = 0.025;
-const longitudeDelta = 0.025;
+const latitudeDelta = 0.015;
+const longitudeDelta = 0.015;
 
 
 export class MapScreen extends React.Component {
@@ -54,7 +55,13 @@ export class MapScreen extends React.Component {
 
     _load() {
 
-      return fetch(CONFIG.API_URL + 'posts?offset=' + 0 +  '&limit=' + 200)
+      return fetch(
+        CONFIG.API_URL +
+        '/posts/near?longitude=' + 
+        this.state.region.longitude + 
+        '&latitude=' +
+        this.state.region.latitude
+      )
         .then((response) => response.json())
         .then((data) => {
           
@@ -67,8 +74,8 @@ export class MapScreen extends React.Component {
                 'key': p._id.$oid,
                 'message': p.message,
                 'coordinates': {
-                  'latitude': p.location.coordinates[0],
-                  'longitude': p.location.coordinates[1]
+                  'latitude': p.location.coordinates[1],
+                  'longitude': p.location.coordinates[0]
                 } 
               }
             }
@@ -107,9 +114,10 @@ export class MapScreen extends React.Component {
               this.state.marker.map(m => (
                 <Marker
                   key={m.key}
-                  title={m.message}
                   coordinate={m.coordinates}
-                />
+                >
+                  <Text style={styles.mapText}>{m.message}</Text>
+                </Marker>
               ))
             }
           </MapView>
@@ -127,6 +135,9 @@ export class MapScreen extends React.Component {
     },
     map: {
       flex: 1
+    },
+    mapText: {
+      fontSize: 30
     },
     marker: {
       height: 48,
