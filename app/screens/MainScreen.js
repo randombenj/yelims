@@ -13,13 +13,16 @@ import EmojiInput from 'react-native-emoji-input';
 
 import { Divider, Button } from 'react-native-elements';
 import { Reactions } from '../components/reactions';
+
 const CONFIG = require('../config');
+
 const limit = 10;
 const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
   const paddingToBottom = 20;
   return layoutMeasurement.height + contentOffset.y >=
     contentSize.height - paddingToBottom;
 };
+
 
 export class MainScreen extends React.Component {
   static navigationOptions = {
@@ -50,7 +53,18 @@ export class MainScreen extends React.Component {
   }
 
   _load() {
-    return fetch(CONFIG.API_URL + 'posts?offset=' + this.state.offset +  '&limit=' + limit)
+    
+    console.log("TOKEN: ", CONFIG.API_TOKEN)
+    return fetch(CONFIG.API_URL +
+      'timeline?offset=' + 
+      this.state.offset +  
+      '&limit=' + 
+      limit, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + CONFIG.API_TOKEN
+        }
+      })
       .then((response) => response.json())
       .then((responseJson) => {
         let posts = this.state.posts.concat(responseJson.posts);
@@ -60,9 +74,8 @@ export class MainScreen extends React.Component {
           refreshing: false,
           offset: offset,
           posts: posts,
-        }, function(){
-
         });
+        this.forceUpdate();
       })
       .catch((error) => {
         console.error(error);
@@ -78,24 +91,24 @@ export class MainScreen extends React.Component {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + CONFIG.API_TOKEN
         },
         body: JSON.stringify({
-            username: 'test',
             message: emoji,
         })
     })
     .then((response) => response.json())
     .then((json) => {
-      console.log("GOT RESP: ", json);
-      let posts = this.state.posts;
-      let post = posts.find(p => p._id.$oid == postId);
-      let index = posts.indexOf(post);
-      console.log("INDEX: ", index);
-      posts[index] = json;
-      this.setState({
-          posts: posts
-      });
-      this.forceUpdate();
+        console.log("GOT RESP: ", json);
+        let posts = this.state.posts;
+        let post = posts.find(p => p._id.$oid == postId);
+        let index = posts.indexOf(post);
+        console.log("INDEX: ", index);
+        posts[index] = json;
+        this.setState({
+            posts: posts
+        });
+        this.forceUpdate();
     })
     .catch((err) => {
         console.log(err);

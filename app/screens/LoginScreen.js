@@ -2,15 +2,19 @@ import React from 'react';
 import {
     Text,
     View,
-    StyleSheet
+    StyleSheet,
+    AsyncStorage
 } from 'react-native';
+
 import {
     FormLabel,
     FormInput,
     FormValidationMessage,
     Button
-} from 'react-native-elements'
+} from 'react-native-elements';
+
 const CONFIG = require('../config');
+
 
 export class LoginScreen extends React.Component {
     static navigationOptions = {
@@ -21,11 +25,50 @@ export class LoginScreen extends React.Component {
         super(props);
 
         this.state = {
-          user: '',
-          pass: '',
+            user: '',
+            pass: '',
         };
-      };
+    };
+
+    _storeToken = (api_token, refresh_token) => {
+        try {
+            AsyncStorage.setItem('api_token', api_token).done();
+            AsyncStorage.setItem('refresh_token', refresh_token).done();
+        } catch (error) {
+            // Error saving data
+            console.warn(error);
+        }
+    }
+
+    _getToken = () => {
+        try {
+            const api_token = AsyncStorage.getItem('api_token').done();
+            const refresh_token = AsyncStorage.getItem('refresh_token').done();
+
+            console.log("GETTING TOKEN: ", api_token)
+
+            return { api_token, refresh_token };
+         } catch (error) {
+           // Error retrieving data
+         }
+    }
+
     _login = ()  =>  {
+
+        // first check if the token is still usable
+        const {
+            api_token,
+            refresh_token
+        } = this._getToken();
+
+        if (api_token && refresh_token) {
+
+            CONFIG.API_TOKEN = api_token;
+            CONFIG.API_REFRESH = refresh_token;
+
+            this.props.navigation.navigate('Home');
+        }
+    
         console.log("Login: username: " + this.state.user + "pass: " + this.state.pass);
         fetch(CONFIG.API_URL + 'auth', {
                 method: 'POST',
@@ -42,9 +85,16 @@ export class LoginScreen extends React.Component {
                 if (responseJson.ok) {
                     console.log("user login");
                     console.log(responseJson);
+                    
+                    CONFIG.API_TOKEN = responseJson.data.token;
+                    CONFIG.API_REFRESH = responseJson.data.refresh;
+
+                    this._storeToken(
+                        CONFIG.API_TOKEN,
+                        CONFIG.API_REFRESH
+                    )
+
                     this.props.navigation.navigate('Home');
-                    CONFIG.API_TOKEN = responseJson.data.token
-                    CONFIG.API_REFRESH = responseJson.data.refresh
                 } else {
                     console.error(responseJson);
                 }
