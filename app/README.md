@@ -1,6 +1,32 @@
 # yelims
 :notebook::smiley:
 
+## Development
+
+How to get started.
+
+```
+sudo npm install -g create-react-native-app
+```
+
+Installing all dependencies
+
+```
+npm install
+```
+
+Run it and connect with [Expo]( https://expo.io/ )
+Install the android [app]( https://play.google.com/store/apps/details?id=host.exp.exponent )
+
+```
+sudo sysctl -w fs.inotify.max_user_instances=2048
+sudo sysctl -w fs.inotify.max_user_watches=524288
+
+npm start
+```
+
+Scan the barcode and the app should open on your phone.
+
 ## Windows
 To start the app on windows, you need to make sure react native uses the correct IP.
 
