@@ -57,11 +57,10 @@ export class SearchScreen extends React.Component {
     console.log(user);
     if(user.following) {
       this.setFollowingForUser(user.username, 'DELETE');
-      this.loadUsers(this.state.lastSearchText);
     } else {
       this.setFollowingForUser(user.username, 'PUT');
-      this.loadUsers(this.state.lastSearchText);
     }
+    this.loadUsers(this.state.lastSearchText);
   }
 
   setFollowingForUser(username, method) {
