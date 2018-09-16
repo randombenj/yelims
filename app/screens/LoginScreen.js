@@ -15,7 +15,6 @@ import {
 
 const CONFIG = require('../config');
 
-
 export class LoginScreen extends React.Component {
     static navigationOptions = {
         title: 'Logout',
@@ -88,6 +87,7 @@ export class LoginScreen extends React.Component {
                     
                     CONFIG.API_TOKEN = responseJson.data.token;
                     CONFIG.API_REFRESH = responseJson.data.refresh;
+                    CONFIG.USERNAME = responseJson.data.username;
 
                     this._storeToken(
                         CONFIG.API_TOKEN,
