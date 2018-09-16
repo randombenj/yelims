@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { Header } from 'react-native-elements';
+import { Text, View, StyleSheet, FlatList } from 'react-native';
+import { Header, ListItem, Icon, Card, Badge } from 'react-native-elements';
 
 const CONFIG = require('../config');
 
@@ -50,20 +50,54 @@ export class ProfileScreen extends React.Component {
     this.getData();
   }
 
+  getListItem = (item) => {
+    console.log(item);
+    return(
+      <ListItem style={styles.listItem}
+          rightIcon={<Icon
+            raised
+            name='heart'
+            type='font-awesome'
+            color='red'
+            />
+          }
+          key={item.item}
+          title={'@' + item.item}
+        />
+    )
+  }
+
+  // I think we need a 'key' property on the 'this.state.folowing' objects to get rid of the warning
   render() {
     return (
       <View style={styles.view}>
         <Header
-          centerComponent={{ text: this.state.username, style: { color: '#fff' } }}
+          centerComponent={{ text: '@' + this.state.username, style: { color: '#fff', fontWeight: 'bold' } }}
           outerContainerStyles={{ backgroundColor: '#3D6DCC' }}
           innerContainerStyles={{ justifyContent: 'space-around' }}
         />
-        <Text>This is the profile screen.. /users/name</Text>
-        <Text>{CONFIG.USERNAME}</Text>
-        <Text>{this.state.username}</Text>
-        <Text>{this.state.postCount}</Text>
-        <Text>{this.state.attentionPoints}</Text>
-        <Text>{this.state.following[0]}</Text>
+        
+        <Card containerStyle={{padding: 5}} >
+          <Text>Posts:</Text>
+          <Badge
+            value={this.state.postCount}
+            textStyle={{ color: 'orange' }}
+          />
+        </Card>
+
+        <Card containerStyle={{padding: 5}} >
+          <Text>Score:</Text>
+          <Badge
+            value={this.state.attentionPoints}
+            textStyle={{ color: 'orange' }}
+          />
+        </Card>
+
+        <Text style={styles.header}>People you follow:</Text>
+        <FlatList
+          data={this.state.following}
+          renderItem={(item) => this.getListItem(item)}
+        />
       </View>
     );
   }
@@ -72,5 +106,9 @@ export class ProfileScreen extends React.Component {
 const styles = StyleSheet.create({
   view: {
     marginTop: 24,
+  },
+  header: {
+    fontSize: 20,
+    marginTop: 15,
   },
 });
