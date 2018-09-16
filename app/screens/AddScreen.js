@@ -39,9 +39,9 @@ export class AddScreen extends React.Component {
     };
 
     _post = () => {
-
         console.log("emoji: " + this.state.emoji);
 
+        // default cordination
         let coords = {
             longitude: "8.5139361",
             latitude: "47.3891512"
@@ -64,12 +64,13 @@ export class AddScreen extends React.Component {
             })
             .then((response) => response.json())
             .then((responseJson) => {
-                if (responseJson.ok) {
-                    console.log("submited post");
-                    console.log(responseJson);
-                } else {
-                    console.log(responseJson);
-                }
+                console.log("submited post");
+                console.log(responseJson);
+                
+                // reset emoji input on successful submit
+                this.setState({
+                    emoji: ""
+                })
             })
             .catch(
                 (error) =>  console.error(error)
