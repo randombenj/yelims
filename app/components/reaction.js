@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
         fontSize: 30
     },
     count: { 
-        top: 22, 
-        left: -20, 
+        top: 25, 
+        left: -15, 
         paddingLeft: 4, 
         paddingRight: 4,
         height: 23,
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
         borderColor: '#efefef', 
         borderWidth: 1, 
         borderRadius: 20,
-        marginRight: -20
+        marginRight: -8
     }
 });
