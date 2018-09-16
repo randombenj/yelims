@@ -18,13 +18,22 @@ export class SearchScreen extends React.Component {
     }
   }
 
+  setStateWithError(errorMessage) {
+    this.setState({ 
+      users: [
+        {
+          message: errorMessage,
+          key: '0',
+        }
+      ],
+      usersLoaded: false,
+      lastSearchText: '',
+    });
+  }
+
   loadUsers = (text) => {
     if(text == '') {
-      this.setState({ 
-        users: ["Enter a username in the search bar to start.",],
-        usersLoaded: false,
-        lastSearchText: '',
-      });
+      this.setStateWithError("Enter a username in the search bar to start.");
       return;
     }
     return fetch(CONFIG.API_URL + 'users?username=' + text, {
@@ -44,11 +53,7 @@ export class SearchScreen extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        this.setState({ 
-          users: ["No users found..",],
-          usersLoaded: false,
-          lastSearchText: '',
-        });
+        this.setStateWithError("No users found.");
       });
   };
 
@@ -105,8 +110,8 @@ export class SearchScreen extends React.Component {
       return (
         <ListItem style={styles.listItem}
           hideChevron
-          key={item.item}
-          title={item.item}
+          key={item.item.message}
+          title={item.item.message}
         />
       )
     }
