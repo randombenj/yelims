@@ -27,6 +27,30 @@ npm start
 
 Scan the barcode and the app should open on your phone.
 
+## Building an apk
+
+To build an apk simply run the following commands:
+
+```sh
+react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+react-native run-android
+```## Building an apk
+
+To build an apk simply run the following commands:
+
+```sh
+react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+react-native run-android
+```## Building an apk
+
+To build an apk simply run the following commands:
+
+```sh
+react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+react-native run-android
+```
+
+
 ## Windows
 To start the app on windows, you need to make sure react native uses the correct IP.
 
