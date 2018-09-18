@@ -1,0 +1,3 @@
+rootProject.name = 'yelmis'
+
+include ':app'
