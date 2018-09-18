@@ -1,4 +1,4 @@
-package com.yelmis;
+package com.yelims;
 
 import android.app.Application;
 
